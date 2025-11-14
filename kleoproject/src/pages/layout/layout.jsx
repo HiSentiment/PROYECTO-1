@@ -37,7 +37,7 @@ export default function Layout() {
   if (loading) {
     return (
       <div className="layout" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <p>Cargando...</p>
+        <div className="loading-spinner"></div>
       </div>
     );
   }

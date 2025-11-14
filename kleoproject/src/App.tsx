@@ -78,52 +78,20 @@ function RoleProtectedRoute({ children, allowedRoles }: { children: JSX.Element;
   return children
 }
 
-// Hook para obtener el rol real desde Firestore
-function useRol() {
+// Componente wrapper para la ruta de login
+function LoginRoute() {
   const [user] = useAuthState(auth)
-  const [rol, setRol] = useState("")
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
-  const [loadingRol, setLoadingRol] = useState(true)
-
-  useEffect(() => {
-    const fetchRol = async () => {
-      setLoadingRol(true)
-      if (user) {
-        let snap = await getDoc(doc(db, "usuariosWeb", user.uid))
-        if (snap.exists()) {
-          const data = snap.data()
-          setRol(data.rol || "")
-          setIsSuperAdmin(data.rol === "SuperAdmin" || user.email === "superadmin@mail.com")
-        }
-      }
-      setLoadingRol(false)
-    }
-    fetchRol()
-  }, [user])
-
-  return { rol, isSuperAdmin, loadingRol }
+  return user ? <Navigate to="/dashboard" replace /> : <Login />
 }
 
 export default function App() {
-  const [user, loadingUser] = useAuthState(auth)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { rol, isSuperAdmin, loadingRol } = useRol()
-
-  if (loadingUser || loadingRol) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div className="loading-spinner"></div>
-      </div>
-    )
-  }
-
   return (
     <Routes>
       {/* 1. Ruta Raíz (PÚBLICA) */}
       <Route path="/" element={<PagInicial />} />
 
       {/* 2. Ruta de Login (PÚBLICA) */}
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/login" element={<LoginRoute />} />
 
       {/* 3. Ruta de Cambiar Contraseña (PRIVADA) */}
       <Route

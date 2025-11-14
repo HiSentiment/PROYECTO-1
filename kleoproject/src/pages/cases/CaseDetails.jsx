@@ -40,9 +40,9 @@ export default function CaseDetails() {
       let d;
       if (typeof value.toDate === "function") {
         d = value.toDate();
-      } else if (typeof value.seconds === "number") {
+      } else if (value.seconds !== undefined) {
         d = new Date(value.seconds * 1000);
-      } else if (typeof value._seconds === "number") {
+      } else if (value._seconds !== undefined) {
         d = new Date(value._seconds * 1000);
       } else if (value instanceof Date) {
         d = value;
@@ -50,13 +50,12 @@ export default function CaseDetails() {
         return "—";
       }
 
-      if (isNaN(d)) return "—";
+      if (isNaN(d.getTime())) return "—";
 
       // Formatear con zona horaria Chile (DD-MM-YYYY)
-      const chileTime = new Date(d.toLocaleString("es-CL", { timeZone: "America/Santiago" }));
-      const dia = String(chileTime.getDate()).padStart(2, "0");
-      const mes = String(chileTime.getMonth() + 1).padStart(2, "0");
-      const anio = chileTime.getFullYear();
+      const dia = String(d.getDate()).padStart(2, "0");
+      const mes = String(d.getMonth() + 1).padStart(2, "0");
+      const anio = d.getFullYear();
       return `${dia}-${mes}-${anio}`;
     } catch {
       return "—";
