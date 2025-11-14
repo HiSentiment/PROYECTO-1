@@ -1,0 +1,183 @@
+/* =========================================
+   🎨 SISTEMA DE TEMAS - LIGHT / DARK
+   Compatible con los hooks de theme en userspage.jsx
+   ========================================= */
+
+:root {
+  /* Valores por defecto (por si no se define tema) */
+  --bg-login: #4fd1c7;
+  --sidebar: #3bb8a8;
+  --primary: #009599;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --surface: #ffffff;
+  --surface-2: #f7fafc;
+
+  /* Extras comunes */
+  --border: #e5e7eb;
+  --button-bg: var(--primary);
+  --button-text: #ffffff;
+  --hover: #00b3b3;
+  --card-bg: var(--surface-2);
+  --input-bg: var(--surface);
+  --input-text: var(--text);
+  --shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* 🌞 Tema Claro */
+:root[data-theme='light'] {
+  --bg-login: #4fd1c7;
+  --sidebar: #3bb8a8;
+  --primary: #8e44ad;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --surface: #ffffff;
+  --surface-2: #f7fafc;
+  --border: #e5e7eb;
+  --button-bg: var(--primary);
+  --button-text: #ffffff;
+  --hover: #9b59b6;
+  --card-bg: var(--surface-2);
+  --input-bg: var(--surface);
+  --input-text: var(--text);
+  --shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* 🌗 Tema Medio */
+:root[data-theme='medium'] {
+  --bg-login: #f6d365;
+  --sidebar: #f1923a;
+  --primary: #ef6c00;
+  --text: #111827;
+  --muted: #6b7280;
+  --surface: #ffffff;
+  --surface-2: #f3f4f6;
+  --border: #d1d5db;
+  --button-bg: var(--primary);
+  --button-text: #ffffff;
+  --hover: #f59e0b;
+  --card-bg: var(--surface-2);
+  --input-bg: var(--surface);
+  --input-text: var(--text);
+  --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* 🌚 Tema Oscuro */
+:root[data-theme='dark'] {
+  --bg-login: #0f172a;
+  --sidebar: #0b1220;
+  --primary: #2563eb;
+  --text: #e6eef8;
+  --muted: #9aa6bf;
+  --surface: #0b1220;
+  --surface-2: #071023;
+  --border: #1e293b;
+  --button-bg: var(--primary);
+  --button-text: #ffffff;
+  --hover: #3b82f6;
+  --card-bg: var(--surface-2);
+  --input-bg: #111827;
+  --input-text: var(--text);
+  --shadow: rgba(255, 255, 255, 0.05);
+}
+
+
+
+/* =========================================
+   🔤 Adaptación global de texto y fondo
+   ========================================= */
+body {
+  background: var(--surface);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Aplicar variables a contenedores y tarjetas comunes */
+.card, .modal, .panel, .dashboard-container {
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 2px 6px var(--shadow);
+}
+
+/* Inputs */
+input, select, textarea {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--border);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted);
+}
+
+/* Botones */
+button {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+button:hover {
+  background: var(--hover);
+}
+
+/* Sidebar y Login */
+.sidebar {
+  background: var(--sidebar);
+  color: var(--text);
+}
+
+.login-container {
+  background: var(--bg-login);
+  color: var(--text);
+}
+
+/* Scrollbars adaptativos */
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+
+/* =========================================
+   🧾 TABLAS: Encabezados y celdas adaptados a tema
+   - Usa variables de tema para color de fondo, texto y bordes
+   - Aplica a las tablas principales: .casos-table, .encuestas__table y tablas genéricas
+   ========================================= */
+.casos-table thead th,
+.encuestas__table thead th,
+table thead th {
+  background: var(--primary);
+  color: var(--button-text);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+}
+
+.casos-table tbody td,
+.encuestas__table tbody td,
+table tbody td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Alternado de filas (ligero) respetando tema */
+.casos-table tbody tr:nth-child(even),
+.encuestas__table tbody tr:nth-child(even),
+table tbody tr:nth-child(even) {
+  background: var(--surface);
+}
+
+/* Ajuste para estados/badges dentro de tablas */
+.status-badge {
+  background: rgba(255,255,255,0.06);
+  color: var(--button-text);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}

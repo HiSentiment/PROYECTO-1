@@ -1,0 +1,816 @@
+/* Eliminadas variables locales, ahora usa variables del sistema de temas */
+
+/* ===== Layout general ===== */
+.casos-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 15px var(--shadow);
+  padding: 2rem;
+  border: 1px solid var(--border);
+  width: 100%;
+}
+
+.casos__tableWrap {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+}
+
+.casos-title {
+  font-size: clamp(1.875rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  text-align: center !important;
+  letter-spacing: -0.025em;
+}
+
+.casos-container {
+  padding: 2rem;
+  margin: 0 auto;
+  background: var(--background);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  width: 100%;
+}
+
+.casos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.casos-header h2 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Badges de estado ahora usan variables del tema */
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.estado-badge.activo {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.estado-badge.pendiente {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--warning);
+}
+
+.estado-badge.cerrado {
+  background: var(--muted);
+  color: var(--text-muted);
+}
+
+/* ===== Botón Crear ===== */
+.btn-crear {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-crear:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 6px var(--shadow);
+  transform: translateY(-1px);
+}
+
+/* ===== Tabla (NO MODIFICAR - se usa en otra página) ===== */
+.casos-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px var(--shadow);
+  overflow-x: auto;
+  background: var(--surface);
+  font-size: 0.9rem;
+}
+
+/* Header de tabla ahora usa variables del tema */
+.casos-table thead th {
+  background: var(--accent);
+  color: var(--surface);
+  text-align: left;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.casos-table tbody td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.casos-table tbody tr:hover {
+  background: var(--muted);
+}
+
+.casos-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== Acciones ===== */
+.acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.acciones button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: var(--radius);
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.acciones button:hover {
+  transform: translateY(-1px);
+}
+
+.acciones button:first-child:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary);
+}
+
+.acciones button:last-child:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* ===== Estados vacíos y errores ===== */
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+/* Loading spinner ahora usa variables del tema */
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container strong {
+  color: var(--danger);
+}
+
+/* ===== Estado vacío ===== */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.empty-state p {
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.empty-state small {
+  color: var(--text-muted);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .casos-container {
+    padding: 1rem;
+  }
+
+  .casos-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .casos-table {
+    font-size: 0.8rem;
+  }
+
+  .casos-table thead th,
+  .casos-table tbody td {
+    padding: 0.75rem;
+  }
+
+  .acciones {
+    gap: 0.5rem;
+  }
+
+  .btn-crear {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===== Search bar ===== */
+.casos-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+/* Search input ahora usa variables del tema */
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal__body form label {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+/* Select personalizado ahora usa variables del tema */
+.custom-select {
+  position: relative;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  background: var(--surface);
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.95rem;
+  color: var(--text);
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.custom-select.loading {
+  color: var(--text-muted);
+  cursor: progress;
+  background: var(--muted);
+  border-color: var(--border);
+}
+
+.custom-select.loading .selected-option {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.custom-select.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: var(--muted);
+}
+
+.custom-select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.selected-option {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.options-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  z-index: 1000;
+  box-shadow: 0 4px 10px var(--shadow);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.option-item {
+  padding: 10px 12px;
+  transition: background 0.15s ease;
+  color: var(--text);
+}
+
+.option-item:hover {
+  background: var(--muted);
+}
+
+.option-item.loading {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.options-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.options-menu::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Detalles card ahora usa variables del tema */
+.detalles-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detalle-item {
+  font-size: 0.95rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detalle-item strong {
+  color: var(--text);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.detalle-item:last-child {
+  border-bottom: none;
+}
+
+.btn-volver {
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-volver:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px var(--shadow);
+}
+
+#btn-volver-casos {
+  width: auto !important;
+  align-self: flex-start;
+  margin-bottom: 1rem;
+}
+
+/* === Diseño adicional para la vista de detalle === */
+.casos-protocolos-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 2rem;
+  align-items: flex-start;
+}
+
+.protocolos-list {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+}
+
+.casos__tableWrap {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.casos-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.selected-row {
+  background: rgba(59, 130, 246, 0.08);
+  transition: background 0.2s ease;
+}
+
+.casos-table tbody tr:hover {
+  background: var(--muted);
+}
+
+.protocolo-detalle {
+  flex: 1;
+  min-width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px var(--shadow);
+}
+
+#audio-item {
+  padding-top: 0.5rem;
+}
+
+/* === Fila flexible de cards === */
+.casos-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+/* Cards ahora usan variables del tema */
+.detalles-card,
+.observaciones-card,
+.protocolos-list,
+.protocolo-detalle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px var(--shadow);
+  padding: 1.5rem;
+  max-height: 450px;
+  overflow-y: auto;
+  transition: box-shadow 0.2s ease;
+}
+
+.detalles-card:hover,
+.observaciones-card:hover,
+.protocolos-list:hover,
+.protocolo-detalle:hover {
+  box-shadow: 0 10px 15px var(--shadow);
+}
+
+.observaciones-card h2,
+.protocolos-list h2,
+.protocolo-detalle h2 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: var(--text);
+  font-weight: 700;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border);
+}
+
+/* === Observaciones: scroll interno solo en la lista === */
+.observaciones-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px var(--shadow);
+  padding: 1.5rem;
+  max-height: 450px;
+}
+
+.obs-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  list-style: none;
+  max-height: 60%;
+  padding-right: 0.25rem;
+  scroll-behavior: smooth;
+}
+
+.obs-list::-webkit-scrollbar {
+  width: 6px;
+}
+.obs-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Observaciones ahora usan variables del tema */
+.obs-item {
+  background: var(--muted);
+  padding: 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 2px var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  overflow-x: hidden;
+  border-left: 3px solid var(--primary);
+  transition: all 0.2s ease;
+}
+
+.obs-item:hover {
+  background: var(--surface);
+  box-shadow: 0 4px 6px var(--shadow);
+  transform: translateX(2px);
+}
+
+.obs-text {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: hidden;
+  color: var(--text);
+}
+
+.obs-item small {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  align-self: flex-end;
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.obs-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.iconBtn--edit:hover {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.iconBtn--delete:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--danger);
+  transform: scale(1.1);
+}
+
+/* Formulario de observaciones ahora usa variables del tema */
+.obs-form {
+  border-top: 2px solid var(--border);
+  padding-top: 1rem;
+  margin-top: auto;
+}
+
+.obs-form textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  min-height: 4em;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.obs-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-guardar {
+  background: var(--primary);
+  color: var(--surface);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-guardar:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px var(--shadow);
+}
+
+.btn-guardar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botones de exportación ahora usan variables del tema */
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--info);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-export:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px var(--shadow);
+}
+
+.btn-export svg {
+  font-size: 18px;
+}
+
+.btn-export:nth-child(1) {
+  background-color: var(--danger);
+}
+.btn-export:nth-child(1):hover {
+  opacity: 0.9;
+}
+
+.btn-export:nth-child(2) {
+  background-color: var(--info);
+}
+.btn-export:nth-child(2):hover {
+  opacity: 0.9;
+}
+
+/* Botón rojo ahora usa variables del tema */
+.boton-rojo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px var(--shadow);
+}
+
+.boton-rojo {
+  background: red;
+  color: var(--surface);
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 6px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.boton-rojo:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px var(--shadow);
+}
+
+.boton-rojo:active {
+  transform: translateY(0);
+}
+
+/* Transcripción ahora usa variables del tema */
+.transcripcion-bloque {
+  background: var(--muted);
+  border-left: 4px solid var(--primary);
+  padding: 1rem;
+  margin: 0.5rem 0 0 0;
+  border-radius: var(--radius);
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+  .casos-row {
+    flex-wrap: wrap;
+  }
+
+  .detalles-card,
+  .observaciones-card,
+  .protocolos-list,
+  .protocolo-detalle {
+    min-width: 100%;
+    max-height: none;
+  }
+
+  .casos-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .casos-container {
+    padding: 1rem;
+  }
+
+  .casos-row {
+    gap: 1rem;
+  }
+
+  .boton-rojo {
+    width: 100%;
+    justify-content: center;
+  }
+}

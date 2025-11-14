@@ -1,0 +1,6 @@
+entornoDjango/
+__pycache__/
+*.pyc
+.env
+firebase-service-account.json
+audiosgrupo5-86b4d-firebase-adminsdk-fbsvc-81541e1941.json
