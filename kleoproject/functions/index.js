@@ -467,7 +467,7 @@ app.post("/UsuarioMovil", async (req, res) => {
     contactosEmergencia,
     contactoRRHH,
   } = req.body;
-  const tempPassword = "cambiar123";
+  const tempPassword = correo;
 
   // Validaciones básicas (área ya no es requerida)
   if (!nombres || !apellidos || !rut || !correo || !rol) {
@@ -533,6 +533,13 @@ app.post("/UsuarioMovil", async (req, res) => {
       entidad: "UsuarioMovil",
       entidadId: userRecord.uid,
       detalle: { datos: req.body }
+    });
+
+    // Enviar correo con credenciales
+    await enviarCorreoNuevoUsuario({
+      to: correo,
+      usuario: correo,
+      password: tempPassword,
     });
 
     res.status(201).json({ uid: userRecord.uid, correo, tempPassword });
@@ -741,7 +748,7 @@ app.post("/UsuarioMovil/bulk", async (req, res) => {
         }
 
         // Crear en Auth
-        const tempPassword = "cambiar123";
+        const tempPassword = correo;
         const userRecord = await admin.auth().createUser({
           email: correo,
           password: tempPassword,
@@ -792,6 +799,13 @@ app.post("/UsuarioMovil/bulk", async (req, res) => {
           entidadId: userRecord.uid,
           detalle: { datos: { ...u, area: area || "" } }
         });
+
+        // Enviar correo con credenciales
+        await enviarCorreoNuevoUsuario({
+        to: correo,
+        usuario: correo,
+        password: tempPassword,
+      });
 
         results.push({ index: i, correo, uid: userRecord.uid, status: "ok" });
         ok++;
@@ -891,6 +905,13 @@ app.post("/usuariosWeb", soloAdminWeb, async (req, res) => {
       entidad: "UsuarioWeb",
       entidadId: userRecord.uid,
       detalle: { datos: req.body }
+    });
+
+    // enviar correo con credenciales
+    await enviarCorreoNuevoUsuario({
+      to: correo,
+      usuario: correo,
+      password: tempPassword,
     });
 
     res.status(201).json({ uid: userRecord.uid, correo, tempPassword });
@@ -1602,3 +1623,34 @@ app.get("/auditoria", async (req, res) => {
     res.status(500).json({ error: "Error obteniendo auditoría" });
   }
 });
+
+// ========================== EMAILS ==========================
+const nodemailer = require("nodemailer");
+
+// Configuración SMTP
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "correos.goodjob@gmail.com", 
+    pass: "duha xrhs pgus tguw",
+  },
+});
+
+// Enviar correo de bienvenida
+async function enviarCorreoNuevoUsuario({ to, usuario, password }) {
+  const mailOptions = {
+    from: '"GoodJob Soporte" <TUCORREO@gmail.com>',
+    to,
+    subject: "Bienvenido a GoodJob",
+    html: `
+      <h2>Bienvenido/a a GoodJob</h2>
+      <p>Tu usuario ha sido registrado en la plataforma.</p>
+      <p><b>Usuario:</b> ${usuario}</p>
+      <p><b>Contraseña:</b> ${password}</p>
+      <p>Descarga la aplicación movil en el siguiente enlace: https://firebasestorage.googleapis.com/v0/b/proyecto-1-2e960.firebasestorage.app/o/app%2FGoodJob.apk?alt=media&token=c870ee58-ea7c-43ff-8746-9cfacac249e6.</p>
+      <p>Por favor, cambia tu contraseña al ingresar por primera vez.</p>
+      <br>
+    `,
+  };
+  await transporter.sendMail(mailOptions);
+}
