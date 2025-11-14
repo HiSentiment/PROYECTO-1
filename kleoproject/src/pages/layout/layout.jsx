@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { auth } from "../../firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 export default function Layout() {
   const [rol, setRol] = useState(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchRol = async () => {
@@ -27,6 +28,11 @@ export default function Layout() {
     };
     fetchRol();
   }, []);
+
+  // Scroll al inicio cuando cambie la ruta
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   if (loading) {
     return (

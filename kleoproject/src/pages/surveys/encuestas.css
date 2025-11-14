@@ -246,6 +246,41 @@
   letter-spacing: 0.05em;
 }
 
+/* ===== Loading states ===== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.error-container strong {
+  color: var(--danger);
+}
+
 .status-active {
   background: var(--success-alpha);
   color: var(--success);

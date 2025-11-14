@@ -435,31 +435,16 @@ export default function Dashboard() {
   ]
 
   // --- Renderizado del Dashboard ---
-  return (
-    <div className="dashboard-container">
-  	<div className="dashboard-wrapper">
-  	  {/* Header (Personalizado por Rol) */}
-  	  <div className="dashboard-header">
-  	    <div className="header-title-wrapper">
-  	      <div className="header-icon-box">
-  		<div className="header-icon">
-  		  <BarChartIcon />
-  		</div>
-  	      </div>
+  return (
+    <div className="dashboard-container">
+  	  {/* Header (Personalizado por Rol) */}
+  	  <div className="dashboard-header">
           {rol === "Gestor Casos" ? (
             <h1 className="dashboard-title">Panel de Gestión de Casos</h1>
           ) : (
             <h1 className="dashboard-title">Panel de Métricas</h1>
           )}
-  	    </div>
-        {rol === "Gestor Casos" ? (
-          <p className="dashboard-subtitle">Visualiza el estado de las vulneraciones activas</p>
-        ) : (
-          <p className="dashboard-subtitle">Visualiza el rendimiento de tus encuestas y casos en tiempo real</p>
-        )}
-  	  </div>
-
-      {/* === SECCIÓN DE ENCUESTAS (SOLO PARA ADMIN Y RRHH) === */}
+  	  </div>      {/* === SECCIÓN DE ENCUESTAS (SOLO PARA ADMIN Y RRHH) === */}
       {(rol === "Admin RRHH" || rol === "Usuario RRHH") && (
         <>
     	  {/* Metrics Grid */}
@@ -753,7 +738,6 @@ export default function Dashboard() {
       )}
       {/* === FIN SECCIÓN DE VULNERACIONES === */}
 
-  	</div>
-    </div>
-  )
+    </div>
+  )
 }

@@ -42,12 +42,14 @@ export default function Sidebar({ rol }) {
   	<aside className="sidebar">
   	  <div className="sidebar__brand">
         {/* LÓGICA DE CLICK ELIMINADA */}
-  		<div className="logo-container">
-  		  {loadingLogo ? (
-  			<div className="logo-skeleton">Cargando...</div>
-  		  ) : (
-  			<img src={logoUrl} alt="Kleo Logo" className="login-logo" />
-  		  )}
+                <div className="logo-container">
+                  {loadingLogo ? (
+                        <div className="logo-skeleton">
+                          <div className="loading-spinner logo-spinner" aria-hidden="true"></div>
+                        </div>
+                  ) : (
+                        <img src={logoUrl} alt="Kleo Logo" className="login-logo" />
+                  )}
           {/* Icono de editar eliminado */}
   		</div>
   	  </div>

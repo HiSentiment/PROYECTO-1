@@ -217,7 +217,6 @@ export default function Casos() {
         {loading && (
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Cargando casos...</p>
           </div>
         )}
 
@@ -227,85 +226,101 @@ export default function Casos() {
           </div>
         )}
 
-        {!loading && !error && (
-          <div className="casos__tableWrap">
-            <table className="casos-table">
-              <thead>
+        <div className="casos__tableWrap">
+          <table className="casos-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Gestor Asignado</th>
+                <th>Usuario</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
                 <tr>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th>Gestor Asignado</th>
-                  <th>Usuario</th>
-                  <th>Acciones</th>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: '2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <div className="loading-spinner"></div>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredAbusos.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" style={{ textAlign: "center", color: "#555" }}>
-                      No hay casos registrados
-                    </td>
-                  </tr>
-                ) : (
-                  filteredAbusos.map((a) => (
-                    <tr key={a.abusoId}>
-                      <td>
-                        {(() => {
-                          try {
-                            if (!a.fecha) return "—";
-                            if (a.fecha.toDate)
-                              return a.fecha.toDate().toLocaleDateString();
-                            if (a.fecha.seconds || a.fecha._seconds)
-                              return new Date(
-                                (a.fecha.seconds || a.fecha._seconds) * 1000
-                              ).toLocaleDateString();
-                            const d = new Date(a.fecha);
-                            return isNaN(d.getTime())
-                              ? "—"
-                              : d.toLocaleDateString();
-                          } catch {
+              ) : filteredAbusos.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", color: "#555" }}>
+                    No hay casos registrados
+                  </td>
+                </tr>
+              ) : (
+                filteredAbusos.map((a) => (
+                  <tr key={a.abusoId}>
+                    <td>
+                      {(() => {
+                        try {
+                          if (!a.fecha) return "—";
+                          
+                          if (typeof a.fecha === "string") {
+                            const partes = a.fecha.split("-");
+                            if (partes.length === 3 && partes[0].length === 4) {
+                              return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                            }
+                          }
+                          
+                          let d;
+                          if (a.fecha.toDate) {
+                            d = a.fecha.toDate();
+                          } else if (a.fecha.seconds || a.fecha._seconds) {
+                            d = new Date((a.fecha.seconds || a.fecha._seconds) * 1000);
+                          } else {
                             return "—";
                           }
-                        })()}
-                      </td>
-                      <td>{a.estado}</td>
-                      <td>{a.nombreGestor || "-"}</td>
-                      <td>{a.nombreUsuario}</td>
-                      <td className="acciones">
-                        
-                        {/* 🔹 Gestor Casos: solo puede ver el caso (sin editar ni borrar) */}
-                        {rol === "Gestor Casos" && (
-                          <button onClick={() => navigate(`/casos/${a.abusoId}`)}>
-                            Ver
+                          
+                          if (isNaN(d.getTime())) return "—";
+                          
+                          const chileTime = new Date(d.toLocaleString("es-CL", { timeZone: "America/Santiago" }));
+                          const dia = String(chileTime.getDate()).padStart(2, "0");
+                          const mes = String(chileTime.getMonth() + 1).padStart(2, "0");
+                          const anio = chileTime.getFullYear();
+                          return `${dia}-${mes}-${anio}`;
+                        } catch {
+                          return "—";
+                        }
+                      })()}
+                    </td>
+                    <td>{a.estado}</td>
+                    <td>{a.nombreGestor || "-"}</td>
+                    <td>{a.nombreUsuario}</td>
+                    <td className="acciones">
+                      {rol === "Gestor Casos" && (
+                        <button onClick={() => navigate(`/casos/${a.abusoId}`)}>
+                          Ver
+                        </button>
+                      )}
+
+                      {rol === "Admin RRHH" && (
+                        <>
+                          <button onClick={() => handleOpenModal(a)}>
+                            <FaEdit />
                           </button>
-                        )}
-
-                        {/* 🔹 Admin RRHH: puede editar y eliminar */}
-                        {rol === "Admin RRHH" && (
-                          <>
-                            <button onClick={() => handleOpenModal(a)}>
-                              <FaEdit />
-                            </button>
-                            <button onClick={() => handleDelete(a.abusoId)}>
-                              <FaTrash />
-                            </button>
-                          </>
-                        )}
-
-                        {/* 🔹 Usuario RRHH: solo eliminar */}
-                        {rol === "Usuario RRHH" && (
                           <button onClick={() => handleDelete(a.abusoId)}>
                             <FaTrash />
                           </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                        </>
+                      )}
+
+                      {rol === "Usuario RRHH" && (
+                        <button onClick={() => handleDelete(a.abusoId)}>
+                          <FaTrash />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {isModalOpen && (

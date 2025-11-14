@@ -14,7 +14,7 @@ const app = express();
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",      // Development
   "http://localhost:3002",      // Development alternative
-  "https://proyecto-1-2e960.web.app", // Production
+  "https://proyecto-1-roan.vercel.app", // Production
   process.env.REACT_APP_ORIGIN, // Custom origin if provided
 ].filter(Boolean); // Remove undefined values
 
@@ -65,21 +65,21 @@ async function esAdmin(uid) {
   );
 }
 
-// Normalizar para FDB
+// Guardar solo la fecha como string YYYY-MM-DD (sin complicaciones de zona horaria)
 function parseLocalDate(dateStr) {
   if (!dateStr) return null;
   try {
-    // Si viene con hora (ej: "2025-10-22T21:30")
-    if (dateStr.includes("T")) {
-      const [datePart, timePart] = dateStr.split("T");
-      const [year, month, day] = datePart.split("-").map(Number);
-      const [hour, minute] = timePart.split(":").map(Number);
-      return new Date(year, month - 1, day, hour, minute, 0);
+    // Si viene como string YYYY-MM-DD, devolverlo tal cual
+    if (typeof dateStr === "string" && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateStr;
     }
-
-    // Si viene solo con fecha (ej: "2025-10-22")
-    const [year, month, day] = dateStr.split("-").map(Number);
-    return new Date(year, month - 1, day, 12, 0, 0); // hora media por defecto
+    
+    // Si viene con hora (ej: "2025-10-22T21:30"), extraer solo la fecha
+    if (typeof dateStr === "string" && dateStr.includes("T")) {
+      return dateStr.split("T")[0];
+    }
+    
+    return null;
   } catch (err) {
     console.error("❌ Error parseando fecha:", dateStr, err);
     return null;
@@ -467,7 +467,7 @@ app.post("/UsuarioMovil", async (req, res) => {
     contactosEmergencia,
     contactoRRHH,
   } = req.body;
-  const tempPassword = correo;
+  const tempPassword = "cambiar123";
 
   // Validaciones básicas (área ya no es requerida)
   if (!nombres || !apellidos || !rut || !correo || !rol) {
@@ -526,19 +526,13 @@ app.post("/UsuarioMovil", async (req, res) => {
       uid: userRecord.uid,
       creadoEn: admin.firestore.FieldValue.serverTimestamp(),
     });
-    // Registrar auditoría
+
     await registrarAuditoria({
       req,
       accion: "Crear usuario",
       entidad: "UsuarioMovil",
       entidadId: userRecord.uid,
       detalle: { datos: req.body }
-    });
- // Enviar correo con credenciales
-    await enviarCorreoNuevoUsuario({
-      to: correo,
-      usuario: correo,
-      password: tempPassword,
     });
 
     res.status(201).json({ uid: userRecord.uid, correo, tempPassword });
@@ -799,13 +793,6 @@ app.post("/UsuarioMovil/bulk", async (req, res) => {
           detalle: { datos: { ...u, area: area || "" } }
         });
 
-        // Enviar correo con credenciales
-        await enviarCorreoNuevoUsuario({
-          to: correo,
-          usuario: correo,
-          password: tempPassword,
-        });
-
         results.push({ index: i, correo, uid: userRecord.uid, status: "ok" });
         ok++;
       } catch (e) {
@@ -905,14 +892,6 @@ app.post("/usuariosWeb", soloAdminWeb, async (req, res) => {
       entidadId: userRecord.uid,
       detalle: { datos: req.body }
     });
-
-    // Enviar correo con credenciales
-    await enviarCorreoNuevoUsuario({
-      to: correo,
-      usuario: correo,
-      password: tempPassword,
-    });
-
 
     res.status(201).json({ uid: userRecord.uid, correo, tempPassword });
   } catch (error) {
@@ -1098,7 +1077,7 @@ app.post("/abusos", async (req, res) => {
 
     const parsedFecha =
       fecha && !isNaN(new Date(fecha).getTime())
-        ? new Date(`${fecha}T00:00:00Z`)
+        ? parseLocalDate(fecha)
         : admin.firestore.FieldValue.serverTimestamp();
 
     let protocolosPrevios = [];
@@ -1623,34 +1602,3 @@ app.get("/auditoria", async (req, res) => {
     res.status(500).json({ error: "Error obteniendo auditoría" });
   }
 });
-
-
-
-const nodemailer = require("nodemailer");
-
-// Configuración SMTP
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "correos.goodjob@gmail.com", // Cambia por tu correo
-    pass: "duha xrhs pgus tguw", // Usa contraseña de aplicación si tienes 2FA
-  },
-});
-
-// Enviar correo de bienvenida
-async function enviarCorreoNuevoUsuario({ to, usuario, password }) {
-  const mailOptions = {
-    from: '"GoodJob Soporte" <TUCORREO@gmail.com>',
-    to,
-    subject: "Bienvenido a GoodJob",
-    html: `
-      <h2>Bienvenido/a a GoodJob</h2>
-      <p>Tu usuario ha sido registrado en la plataforma.</p>
-      <p><b>Usuario:</b> ${usuario}</p>
-      <p><b>Contraseña:</b> ${password}</p>
-      <p>Por favor, cambia tu contraseña al ingresar por primera vez.</p>
-      <br>
-    `,
-  };
-  await transporter.sendMail(mailOptions);
-}

@@ -25,21 +25,43 @@ export default function CaseDetails() {
   const [textoObs, setTextoObs] = useState("")
 
   const parseFechaSegura = (value) => {
-    if (!value) return "—"
+    if (!value) return "—";
     try {
-      if (typeof value.toDate === "function") return value.toDate().toLocaleString()
-      if (typeof value.seconds === "number") return new Date(value.seconds * 1000).toLocaleString()
-      if (typeof value._seconds === "number") return new Date(value._seconds * 1000).toLocaleString()
-      if (value instanceof Date) return !isNaN(value) ? value.toLocaleString() : "—"
+      // Si la fecha viene como string YYYY-MM-DD, convertir directamente
       if (typeof value === "string") {
-        const d = new Date(value)
-        return !isNaN(d) ? d.toLocaleString() : "—"
+        const partes = value.split("-");
+        if (partes.length === 3 && partes[0].length === 4) {
+          // Es YYYY-MM-DD
+          return `${partes[2]}-${partes[1]}-${partes[0]}`; // DD-MM-YYYY
+        }
       }
+
+      // Si viene como timestamp Firestore
+      let d;
+      if (typeof value.toDate === "function") {
+        d = value.toDate();
+      } else if (typeof value.seconds === "number") {
+        d = new Date(value.seconds * 1000);
+      } else if (typeof value._seconds === "number") {
+        d = new Date(value._seconds * 1000);
+      } else if (value instanceof Date) {
+        d = value;
+      } else {
+        return "—";
+      }
+
+      if (isNaN(d)) return "—";
+
+      // Formatear con zona horaria Chile (DD-MM-YYYY)
+      const chileTime = new Date(d.toLocaleString("es-CL", { timeZone: "America/Santiago" }));
+      const dia = String(chileTime.getDate()).padStart(2, "0");
+      const mes = String(chileTime.getMonth() + 1).padStart(2, "0");
+      const anio = chileTime.getFullYear();
+      return `${dia}-${mes}-${anio}`;
     } catch {
-      return "—"
+      return "—";
     }
-    return "—"
-  }
+  };
 
   // 🧱 Verificar rol
   useEffect(() => {
@@ -97,6 +119,34 @@ export default function CaseDetails() {
         })
         if (!resCaso.ok) throw new Error("Error al obtener detalles del caso")
         const dataCaso = await resCaso.json() // 'let' para poder modificarlo
+
+        // --- 🔒 VALIDACIÓN: Solo Gestor Casos puede ver detalles ---
+        // Obtener rol del usuario actual
+        logApiCall("GET", API_ENDPOINTS.USUARIOS_WEB_BASIC)
+        const resUsuariosWebCheck = await fetch(API_ENDPOINTS.USUARIOS_WEB_BASIC, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        
+        if (resUsuariosWebCheck.ok) {
+          const dataUsuarios = await resUsuariosWebCheck.json()
+          const usuarioActual = dataUsuarios.find((u) => u.id === user.uid)
+          const rolActual = usuarioActual?.rol || "Desconocido"
+          
+          // Solo Gestor Casos puede ver detalles
+          if (rolActual !== "Gestor Casos") {
+            alert("Solo los Gestores de Casos pueden ver los detalles de un caso.")
+            navigate("/casos")
+            return
+          }
+          
+          // Verificar que el caso le pertenece
+          if (dataCaso.gestorAsignado !== user.uid) {
+            alert("No tienes permiso para ver este caso. Solo puedes ver los casos asignados a ti.")
+            navigate("/casos")
+            return
+          }
+        }
+        // --- FIN VALIDACIÓN ---
 
         // --- 2. Obtener el usuarioId del caso ---
         const usuarioDelCasoId = dataCaso.usuarioId

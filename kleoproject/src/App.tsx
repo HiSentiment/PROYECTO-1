@@ -20,10 +20,62 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
   const [user, loading] = useAuthState(auth)
 
   if (loading) {
-    return <p>Cargando...</p>
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="loading-spinner"></div>
+      </div>
+    )
   }
 
   return user ? children : <Navigate to="/login" replace />
+}
+
+// Componente para proteger rutas por rol
+function RoleProtectedRoute({ children, allowedRoles }: { children: JSX.Element; allowedRoles: string[] }) {
+  const [user, loadingUser] = useAuthState(auth)
+  const [rol, setRol] = useState<string | null>(null)
+  const [loadingRol, setLoadingRol] = useState(true)
+
+  useEffect(() => {
+    const fetchRol = async () => {
+      setLoadingRol(true)
+      if (user) {
+        const snap = await getDoc(doc(db, "usuariosWeb", user.uid))
+        if (snap.exists()) {
+          const data = snap.data()
+          setRol(data.rol || null)
+        } else {
+          setRol(null)
+        }
+      } else {
+        setRol(null)
+      }
+      setLoadingRol(false)
+    }
+    fetchRol()
+  }, [user])
+
+  if (loadingUser || loadingRol) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="loading-spinner"></div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  // Verificar si es superadmin
+  const isSuperAdmin = user.email === "superadmin@mail.com"
+
+  // Verificar si tiene un rol permitido o es superadmin
+  if (!isSuperAdmin && (!rol || !allowedRoles.includes(rol))) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return children
 }
 
 // Hook para obtener el rol real desde Firestore
@@ -54,10 +106,15 @@ function useRol() {
 
 export default function App() {
   const [user, loadingUser] = useAuthState(auth)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { rol, isSuperAdmin, loadingRol } = useRol()
 
   if (loadingUser || loadingRol) {
-    return <p>Cargando...</p>
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="loading-spinner"></div>
+      </div>
+    )
   }
 
   return (
@@ -86,27 +143,67 @@ export default function App() {
           </PrivateRoute>
         }
       >
-        {/* Tus rutas de admin */}
+        {/* Dashboard - Todos los usuarios autenticados */}
         <Route path="/dashboard" element={<Dashboard />} />
 
-        {(rol === "Admin RRHH" || rol === "Usuario RRHH" || isSuperAdmin) && (
-          <Route path="/usuarios" element={<UsersPage />} />
-        )}
+        {/* Usuarios - Solo Admin RRHH y Usuario RRHH */}
+        <Route
+          path="/usuarios"
+          element={
+            <RoleProtectedRoute allowedRoles={["Admin RRHH", "Usuario RRHH"]}>
+              <UsersPage />
+            </RoleProtectedRoute>
+          }
+        />
 
-        {(rol === "Admin RRHH" || rol === "Usuario RRHH" || isSuperAdmin) && (
-          <Route path="/encuestas" element={<Surveys />} />
-        )}
+        {/* Encuestas - Solo Admin RRHH y Usuario RRHH */}
+        <Route
+          path="/encuestas"
+          element={
+            <RoleProtectedRoute allowedRoles={["Admin RRHH", "Usuario RRHH"]}>
+              <Surveys />
+            </RoleProtectedRoute>
+          }
+        />
 
-        {(rol === "Admin RRHH" || rol === "Gestor Casos" || isSuperAdmin || rol === "Usuario RRHH") && (
-          <Route path="/casos" element={<Casos />} />
-        )}
+        {/* Casos - Admin RRHH, Usuario RRHH y Gestor Casos */}
+        <Route
+          path="/casos"
+          element={
+            <RoleProtectedRoute allowedRoles={["Admin RRHH", "Usuario RRHH", "Gestor Casos"]}>
+              <Casos />
+            </RoleProtectedRoute>
+          }
+        />
 
-        {(rol === "Admin RRHH" || isSuperAdmin) && <Route path="/auditoria" element={<AuditLogPage />} />}
+        {/* Detalle de Caso - SOLO Gestor Casos */}
+        <Route
+          path="/casos/:id"
+          element={
+            <RoleProtectedRoute allowedRoles={["Gestor Casos"]}>
+              <CaseDetail />
+            </RoleProtectedRoute>
+          }
+        />
 
-        <Route path="/casos/:id" element={<CaseDetail />} />
+        {/* Auditoría - Solo Admin RRHH */}
+        <Route
+          path="/auditoria"
+          element={
+            <RoleProtectedRoute allowedRoles={["Admin RRHH"]}>
+              <AuditLogPage />
+            </RoleProtectedRoute>
+          }
+        />
+
+        {/* Nueva Encuesta - Solo Admin RRHH y Usuario RRHH */}
         <Route
           path="/nueva-encuesta"
-          element={<NewSurvey isOpen={true} onClose={() => {}} onSave={() => {}} initialData={null} />}
+          element={
+            <RoleProtectedRoute allowedRoles={["Admin RRHH", "Usuario RRHH"]}>
+              <NewSurvey isOpen={true} onClose={() => {}} onSave={() => {}} initialData={null} />
+            </RoleProtectedRoute>
+          }
         />
       </Route>
 

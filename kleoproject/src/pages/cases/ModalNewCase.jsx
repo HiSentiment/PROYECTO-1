@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { auth } from "../../firebase";
 import { API_ENDPOINTS, logApiCall } from "../../api/apiConfig";
 import "../users/modal.css";
@@ -26,9 +26,22 @@ export default function ModalNewCase({ isOpen, onClose, onSave, initialData }) {
   // helper para normalizar id de usuario (uid / usuarioId / id / _id)
   const getUserId = (u) => u?.uid ?? u?.usuarioId ?? u?.id ?? u?._id ?? "";
 
-  const parseFechaSegura = (value) => {
+  // Convertir formato DD-MM-YYYY a YYYY-MM-DD para el input date
+  const convertirAFormatoInput = useCallback((value) => {
     if (!value) return "";
     try {
+      if (typeof value === "string" && value.includes("-")) {
+        // Si es DD-MM-YYYY, convertir a YYYY-MM-DD
+        const partes = value.split("-");
+        if (partes.length === 3 && partes[0].length === 2) {
+          return `${partes[2]}-${partes[1]}-${partes[0]}`; // YYYY-MM-DD
+        }
+        // Si ya es YYYY-MM-DD, devolverlo tal cual
+        if (partes.length === 3 && partes[0].length === 4) {
+          return value;
+        }
+      }
+      
       if (typeof value.toDate === "function") {
         const d = value.toDate();
         if (!isNaN(d)) return d.toISOString().split("T")[0];
@@ -48,11 +61,15 @@ export default function ModalNewCase({ isOpen, onClose, onSave, initialData }) {
         const d = new Date(value);
         if (!isNaN(d)) return d.toISOString().split("T")[0];
       }
-    } catch {
-      console.warn("⚠️ Fecha inválida recibida:", value);
+    } catch (err) {
+      console.warn("⚠️ Fecha inválida recibida:", value, err);
     }
     return "";
-  };
+  }, []);
+
+  const parseFechaSegura = useCallback((value) => {
+    return convertirAFormatoInput(value);
+  }, [convertirAFormatoInput]);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,7 +88,7 @@ export default function ModalNewCase({ isOpen, onClose, onSave, initialData }) {
       }
       setIsSubmitting(false);
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, initialData, parseFechaSegura]);
 
   // 🔹 Cargar gestores y usuarios
   useEffect(() => {
@@ -153,9 +170,11 @@ export default function ModalNewCase({ isOpen, onClose, onSave, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // El input type="date" devuelve formato YYYY-MM-DD
+    // El backend lo procesa considerando zona horaria Chile
     const nuevoCaso = {
       usuarioId,
-      fecha,
+      fecha: fecha, // YYYY-MM-DD
       estado,
       observaciones,
       gestorAsignado, // ✅ solo el UID del gestor

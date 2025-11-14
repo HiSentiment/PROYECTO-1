@@ -3,7 +3,7 @@ import { auth } from "../../firebase";
 import { API_ENDPOINTS, logApiCall } from "../../api/apiConfig";
 import { FaEye } from "react-icons/fa";
 
-export default function AuditLogTable() {
+export default function AuditLogTable({ search }) {
   const [logs, setLogs] = useState([]);
   const [usuariosWeb, setUsuariosWeb] = useState({});
   const [loading, setLoading] = useState(true);
@@ -65,6 +65,28 @@ export default function AuditLogTable() {
     return 0;
   }
 
+  // Filtrar logs según búsqueda (usa `search` pasado desde el padre)
+  const filteredLogs = logs.filter(log => {
+    const usuario = usuariosWeb[log.usuarioUid] || {};
+    const nombreCompleto = usuario.nombres
+      ? `${usuario.nombres} ${usuario.apellidos}`.toLowerCase()
+      : "";
+    const rut = (usuario.rut || "").toLowerCase();
+    const accion = (log.accion || "").toLowerCase();
+    const entidad = (log.entidad || "").toLowerCase();
+    const entidadId = (log.entidadId || "").toLowerCase();
+    
+    const searchLower = (search || "").toLowerCase();
+    
+    return (
+      nombreCompleto.includes(searchLower) ||
+      rut.includes(searchLower) ||
+      accion.includes(searchLower) ||
+      entidad.includes(searchLower) ||
+      entidadId.includes(searchLower)
+    );
+  });
+
   return (
     <>
       {/* === TABLA === */}
@@ -84,14 +106,20 @@ export default function AuditLogTable() {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={7}>Cargando...</td>
+              <td colSpan={7}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                  <div className="loading-spinner"></div>
+                </div>
+              </td>
             </tr>
-          ) : logs.length === 0 ? (
+          ) : filteredLogs.length === 0 ? (
             <tr>
-              <td colSpan={7}>Sin registros</td>
+              <td colSpan={7} style={{ textAlign: "center" }}>
+                {logs.length === 0 ? "Sin registros" : "No se encontraron resultados"}
+              </td>
             </tr>
           ) : (
-            [...logs]
+            [...filteredLogs]
               .sort((a, b) => getTime(b) - getTime(a))
               .map(log => {
                 const usuario = usuariosWeb[log.usuarioUid] || {};
@@ -143,7 +171,6 @@ export default function AuditLogTable() {
           )}
         </tbody>
       </table>
-
       {/* === MODAL DETALLE === */}
       {detalleActual && (
         <div className="modal__overlay" onClick={() => setDetalleActual(null)}>

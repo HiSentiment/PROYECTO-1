@@ -240,7 +240,6 @@ export default function Encuestas() {
         {loading && (
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Cargando encuestas...</p>
           </div>
         )}
 
@@ -250,105 +249,111 @@ export default function Encuestas() {
           </div>
         )}
 
-        {!loading && !error && (
-          <div className="table-container">
-            <div className="encuestas__tableWrap">
-              <table className="encuestas__table">
-                <thead>
+        <div className="table-container">
+          <div className="encuestas__tableWrap">
+            <table className="encuestas__table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Preguntas</th>
+                  <th>Áreas</th>
+                  <th>Fecha Inicio</th>
+                  <th>Fecha Fin</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Preguntas</th>
-                    <th>Áreas</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Fin</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <td colSpan={8} style={{ textAlign: 'center', padding: '2rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <div className="loading-spinner"></div>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filtered.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="empty">
-                        <div className="empty-state">
-                          <p>No hay encuestas que coincidan con los filtros</p>
-                        </div>
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="empty">
+                      <div className="empty-state">
+                        <p>No hay encuestas que coincidan con los filtros</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((s) => (
+                    <tr key={s.encuestaId}>
+                      <td>
+                        <code>{s.encuestaId}</code>
+                      </td>
+                      <td>
+                        <strong>{s.titulo}</strong>
+                      </td>
+                      <td>
+                        {Array.isArray(s.preguntas) && s.preguntas.length > 0 ? (
+                          <ol className="questions-list">
+                            {s.preguntas.map((p, index) => (
+                              <li key={index}>
+                                <strong>{p.texto}</strong> <em>({p.tipo})</em>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <span style={{ color: "var(--gray-400)" }}>
+                            Sin preguntas
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {Array.isArray(s.area) && s.area.length > 0 ? (
+                          <ul className="areas-list">
+                            {s.area.map((id) => (
+                              <li key={id}>{areaMap[id] || id}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td>{formatDate(s.fechaInicio)}</td>
+                      <td>{formatDate(s.fechaFin)}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            s.activa ? "status-active" : "status-inactive"
+                          }`}
+                        >
+                          {s.activa ? "Activa" : "Inactiva"}
+                        </span>
+                      </td>
+                      <td className="col-actions">
+                        <button
+                          title="Editar encuesta"
+                          className="iconBtn iconBtn--edit"
+                          onClick={() => {
+                            setEditingSurvey(s);
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          title="Eliminar encuesta"
+                          className="iconBtn iconBtn--delete"
+                          onClick={() => handleDelete(s.encuestaId)}
+                        >
+                          <FaTrash />
+                        </button>
+                        
                       </td>
                     </tr>
-                  ) : (
-                    filtered.map((s) => (
-                      <tr key={s.encuestaId}>
-                        <td>
-                          <code>{s.encuestaId}</code>
-                        </td>
-                        <td>
-                          <strong>{s.titulo}</strong>
-                        </td>
-                        <td>
-                          {Array.isArray(s.preguntas) && s.preguntas.length > 0 ? (
-                            <ol className="questions-list">
-                              {s.preguntas.map((p, index) => (
-                                <li key={index}>
-                                  <strong>{p.texto}</strong> <em>({p.tipo})</em>
-                                </li>
-                              ))}
-                            </ol>
-                          ) : (
-                            <span style={{ color: "var(--gray-400)" }}>
-                              Sin preguntas
-                            </span>
-                          )}
-                        </td>
-                        <td>
-                          {Array.isArray(s.area) && s.area.length > 0 ? (
-                            <ul className="areas-list">
-                              {s.area.map((id) => (
-                                <li key={id}>{areaMap[id] || id}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td>{formatDate(s.fechaInicio)}</td>
-                        <td>{formatDate(s.fechaFin)}</td>
-                        <td>
-                          <span
-                            className={`status-badge ${
-                              s.activa ? "status-active" : "status-inactive"
-                            }`}
-                          >
-                            {s.activa ? "Activa" : "Inactiva"}
-                          </span>
-                        </td>
-                        <td className="col-actions">
-                          <button
-                            title="Editar encuesta"
-                            className="iconBtn iconBtn--edit"
-                            onClick={() => {
-                              setEditingSurvey(s);
-                              setIsModalOpen(true);
-                            }}
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            title="Eliminar encuesta"
-                            className="iconBtn iconBtn--delete"
-                            onClick={() => handleDelete(s.encuestaId)}
-                          >
-                            <FaTrash />
-                          </button>
-                          
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
 
         <NewSurveyModal
           isOpen={isModalOpen}

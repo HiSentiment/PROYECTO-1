@@ -93,7 +93,7 @@ body {
 }
 
 /* Aplicar variables a contenedores y tarjetas comunes */
-.card, .modal, .panel, .dashboard-container {
+.card, .modal, .panel {
   background: var(--card-bg);
   color: var(--text);
   box-shadow: 0 2px 6px var(--shadow);
